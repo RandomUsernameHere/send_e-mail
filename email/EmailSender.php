@@ -160,8 +160,12 @@
                 return $e;
             }
         }
-        
-        protected  function setParams($params){
+
+        /**
+         * @param $params array
+         * @return void
+         */
+        protected  function setParams(array $params){
             foreach($params as $param=>$value){
                 if(!empty($value)){
                     switch($param){
@@ -207,8 +211,12 @@
                 }
             }
         }
-        
-        protected function checkParams($params){
+
+        /**
+         * @param $params array
+         * @return bool|\Exception
+         */
+        protected function checkParams(array $params){
             
             try{
                 
@@ -235,10 +243,6 @@
             }           
             
         }
-        
-        
-
-
         
         /**
         * @param string $emailTo
@@ -302,7 +306,11 @@
         public function setMessage($message) {
             $this->message = $message;
         }
-        
+
+        /**
+         * @param array $params
+         * @return bool|\Exception
+         */
         public function send(array $params=array()){
             $this->setParams($params);
             try{
@@ -339,10 +347,10 @@
                         }
                     }
 
-                    $message = $this->message.$attach;
+                    $message = $this->generateMessageText().$attach;
                 }
                 else{
-                    $message = $this->message;
+                    $message = $this->generateMessageText();
                 }
 
                 $headers = $this->generateMessageHeaders();

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Класс для отправки почты(с вложениями либо без них)</title>
+</head>
+<body>
+
+<h1>Класс для отправки почты(с вложениями либо без них)</h1>
+
+<div>
+
+    <h2>Описание класса</h2>
+
+    <div>
+        <p>
+            Класс предназначен для формирования и отправки электронной почты.
+        </p>
+
+        <p>
+            Пользуясь данным классом возможно отправлять письма с вложениями, а так же с дополнительными заголовками:
+        </p>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Заголовок</td>
+                        <td>Описание</td>
+                        <td>Параметр</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>From:</td>
+                        <td>В почтовых клиентах данные из этого заголовка видны в поле "ОТ"</td>
+                        <td>EMAIL_FROM</td>
+                    </tr>
+                    <tr>
+                        <td>Bc:</td>
+                        <td>Скрытая копия. На этот адрес уходит скрытая копия письма</td>
+                        <td>HIDDEN_COPY</td>
+                    </tr>
+                    <tr>
+                        <td>Reply to:</td>
+                        <td>В почтовом клиенте этот адрес появится при нажатии кнопки "Ответить"</td>
+                        <td>REPLY_TO</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+    </div>
+
+    <h2>Быстрый старт</h2>
+
+    <div>
+        <p>
+            Все данные для формирования письма можно передать прямо в конструктор:</p>
+            <div>
+                <pre class="php" style="font-family:monospace;"><span style="color: #000088;">$mailSend</span> <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> \web136\email\EmailSender<span style="color: #009900;">&#40;</span>
+        <span style="color: #990000;">array</span>
+        <span style="color: #009900;">&#40;</span>
+            <span style="color: #0000ff;">'EMAIL_TO'</span><span style="color: #339933;">=&gt;</span><span style="color: #0000ff;">'jamanphonehtc@gmail.com'</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'EMAIL_THEME'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'Test '</span><span style="color: #339933;">.</span><span style="color: #990000;">time</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'MESSAGE_TEXT'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'SImple test for mail где текст мать вашу!'</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'FILE_ATTACH'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #990000;">array</span>
+            <span style="color: #009900;">&#40;</span>
+                <span style="color: #000088;">$_SERVER</span><span style="color: #009900;">&#91;</span><span style="color: #0000ff;">'DOCUMENT_ROOT'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">.</span><span style="color: #0000ff;">'/images/no-person-photo.jpg'</span><span style="color: #339933;">,</span>
+                <span style="color: #000088;">$_SERVER</span><span style="color: #009900;">&#91;</span><span style="color: #0000ff;">'DOCUMENT_ROOT'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">.</span><span style="color: #0000ff;">'/css/style.css'</span>
+            <span style="color: #009900;">&#41;</span>
+        <span style="color: #009900;">&#41;</span>
+    <span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre>
+            </div>
+
+        <p>После этого воспользоваться методом <a href="#method_send">send()</a></p>
+        <p>Можно создать объект класса без параметров, а всю необходимую информацию передать при вызове метода
+            <a href="#method_send">send()</a></p>
+        <div>
+            <pre class="php" style="font-family:monospace;"><span style="color: #000088;">$mailSend</span> <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> \web136\email\EmailSender<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+    <span style="color: #000088;">$result</span> <span style="color: #339933;">=</span> <span style="color: #000088;">$mailSend</span><span style="color: #339933;">-&gt;</span><span style="color: #004000;">send</span><span style="color: #009900;">&#40;</span>
+        <span style="color: #990000;">array</span>
+        <span style="color: #009900;">&#40;</span>
+            <span style="color: #0000ff;">'EMAIL_TO'</span><span style="color: #339933;">=&gt;</span><span style="color: #0000ff;">'jamanphonehtc@gmail.com'</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'EMAIL_THEME'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'Test '</span><span style="color: #339933;">.</span><span style="color: #990000;">time</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'MESSAGE_TEXT'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #0000ff;">'SImple test for mail где текст мать вашу!'</span><span style="color: #339933;">,</span>
+            <span style="color: #0000ff;">'FILE_ATTACH'</span> <span style="color: #339933;">=&gt;</span> <span style="color: #990000;">array</span>
+            <span style="color: #009900;">&#40;</span>
+                <span style="color: #000088;">$_SERVER</span><span style="color: #009900;">&#91;</span><span style="color: #0000ff;">'DOCUMENT_ROOT'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">.</span><span style="color: #0000ff;">'/images/no-person-photo.jpg'</span><span style="color: #339933;">,</span>
+                <span style="color: #000088;">$_SERVER</span><span style="color: #009900;">&#91;</span><span style="color: #0000ff;">'DOCUMENT_ROOT'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">.</span><span style="color: #0000ff;">'/css/style.css'</span>
+            <span style="color: #009900;">&#41;</span>
+        <span style="color: #009900;">&#41;</span>
+    <span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre>
+        </div>
+
+        <p>
+            Кроме того, предусмотрена возможность изменять все данные письма с помощью сеттеров.
+        </p>
+
+    </div>
+
+    <h2>Подробности</h2>
+    <div>
+        <p>Собственно отправка письма производится методом <a href="#method_send">send()</a>. При помощи стандартной
+        функции PHP <a href="http://php.net/manual/ru/function.mail.php">mail()</a></p>
+        <p>
+            На методах класса лежит работа по формированию заголовков. Только по формированию. 
+            Это значит, что методы класса не производят многих проверок.
+            
+        </p>
+        <p>
+            Например: параметр EMAIL_TO, в котором хранится адрес, на который будет отправлено письмо, не проверяется
+            на корректность e-mail. Так задумано изначально. Класс отправки писем, по мнению разработчика, не должен 
+            отвечать за проверку. Для этого должен служить отдельный функционал.
+        </p>
+        <p>
+            Однако, совсем без проверок не обошлось.
+        </p>
+        <p>
+            Большинство из них сосредоточены в методе <a href="#method_checkParams">checkParams()</a>
+        </p>
+        <p>По большому счету этот метод проверяет заполнены ли необхлдимые параметры:</p>
+        <ul>
+            <li>EMAIL_TO</li>
+
+            <li>EMAIL_THEME</li>
+
+            <li>CONTENT_TYPE</li>
+
+            <li>ENCODING</li>
+        </ul>
+    </div>
+    
+    
+    <h2 id="all_params">Полный список параметров</h2>
+    
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <td>Название</td>
+                    <td>Тип</td>
+                    <td>Обязательность</td>
+                    <td>Описание</td>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr>
+                    <td id="EMAIL_TO">EMAIL_TO</td>
+                    <td>string</td>
+                    <td>require</td>
+                    <td>Адрес получателя письма</td>
+                </tr>
+
+                <tr>
+                    <td id="EMAIL_THEME">EMAIL_THEME</td>
+                    <td>string</td>
+                    <td>require</td>
+                    <td>Тема письма. Обязательна из-за особенностей спецификации</td>
+                </tr>
+
+                <tr>
+                    <td id="CONTENT_TYPE">CONTENT_TYPE</td>
+                    <td>string</td>
+                    <td>require</td>
+                    <td>Тип текста в письме. По умолчению text/html</td>
+                </tr>
+
+                <tr>
+                    <td id="EMAIL_FROM">EMAIL_FROM</td>
+                    <td>string</td>
+                    <td></td>
+                    <td>Адрес отправителя письма</td>
+                </tr>
+
+                <tr>
+                    <td id="HIDDEN_COPY">HIDDEN_COPY</td>
+                    <td>string</td>
+                    <td></td>
+                    <td>Адрес получателя скрытой копии письма</td>
+                </tr>
+
+                <tr>
+                    <td id="REPLY_TO">REPLY_TO</td>
+                    <td>string</td>
+                    <td></td>
+                    <td>Ответ на этот адрес</td>
+                </tr>
+
+                <tr>
+                    <td id="ENCODING">ENCODING</td>
+                    <td>string</td>
+                    <td>require</td>
+                    <td>Кодировка письма. По умолчанию "utf8"</td>
+                </tr>
+
+                <tr>
+                    <td id="MESSAGE_TEXT">MESSAGE_TEXT</td>
+                    <td>string</td>
+                    <td></td>
+                    <td>Текст письма</td>
+                </tr>
+
+                <tr>
+                    <td id="FILE_ATTACH">FILE_ATTACH</td>
+                    <td>string|array</td>
+                    <td></td>
+                    <td>Файл или файлы вложений</td>
+                </tr>
+
+            </tbody>
+
+        </table>
+    </div>
+
+
+    <h2>Методы класса</h2>
+
+
+    <div>
+        <span style="color: #0000ff;">public</span>
+        function __construct
+        <span style="color: #008000;">&#40;</span>
+        array
+        $params
+        <span style="color: #000080;">=</span>
+        array
+        <span style="color: #008000;">&#40;</span>
+        <span style="color: #008000;">&#41;</span>
+        <span style="color: #008000;">&#41;</span>
+
+        <div>
+
+        </div>
+    </div>
+
+
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @return void
+        */</span>
+        <span style="color: #0000ff;">protected</span> function generateBoundary<span
+            style="color: #008000;">&#40;</span><span style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @return string
+        */</span>
+        <span style="color: #0000ff;">protected</span> function generateMessageHeaders<span
+            style="color: #008000;">&#40;</span><span style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @return string
+        */</span>
+        <span style="color: #0000ff;">protected</span> function generateMessageText<span
+            style="color: #008000;">&#40;</span><span style="color: #008000;">&#41;</span><span style="color: #008000;">&#123;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param $path
+        * @return bool|string
+        */</span>
+        <span style="color: #0000ff;">protected</span> function getFileNameFromPath<span
+            style="color: #008000;">&#40;</span>$path<span style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param $path
+        * @return \Exception|string
+        */</span>
+        <span style="color: #0000ff;">protected</span> function generateMessageAttach<span
+            style="color: #008000;">&#40;</span>$path<span style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #0000ff;">protected</span> function setParams<span
+            style="color: #008000;">&#40;</span>$params<span style="color: #008000;">&#41;</span>
+    </div>
+    <div id="method_checkParams">
+        <span style="color: #0000ff;">protected</span> function checkParams<span style="color: #008000;">&#40;</span>$params<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $emailTo
+        */</span>
+        <span style="color: #0000ff;">public</span> function setEmailTo<span
+            style="color: #008000;">&#40;</span>$emailTo<span style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param mixed $messageAttach
+        */</span>
+        <span style="color: #0000ff;">public</span> function setMessageAttach<span style="color: #008000;">&#40;</span>$messageAttach<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $emailTheme
+        */</span>
+        <span style="color: #0000ff;">public</span> function setEmailTheme<span style="color: #008000;">&#40;</span>$emailTheme<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $emailContentType
+        */</span>
+        <span style="color: #0000ff;">public</span> function setEmailContentType<span
+            style="color: #008000;">&#40;</span>$emailContentType<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $emailFrom
+        */</span>
+        <span style="color: #0000ff;">public</span> function setEmailFrom<span style="color: #008000;">&#40;</span>$emailFrom<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $hiddenCopy
+        */</span>
+        <span style="color: #0000ff;">public</span> function setHiddenCopy<span style="color: #008000;">&#40;</span>$hiddenCopy<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $emailReplyTo
+        */</span>
+        <span style="color: #0000ff;">public</span>
+        function setEmailReplyTo
+        <span style="color: #008000;">&#40;</span>
+        $emailReplyTo
+        <span style="color: #008000;">&#41;</span>
+
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">
+        /**
+        * @param string $emailEncoding
+        */</span>
+        <span style="color: #0000ff;">public</span> function setEmailEncoding<span style="color: #008000;">&#40;</span>$emailEncoding<span
+            style="color: #008000;">&#41;</span>
+    </div>
+    <div>
+        <span style="color: #ff0000; font-style: italic;">/**
+        * @param string $message
+        */</span>
+        <span style="color: #0000ff;">public</span> function setMessage<span
+            style="color: #008000;">&#40;</span>$message<span style="color: #008000;">&#41;</span>
+    </div>
+    <div id="method_send">
+        <span style="color: #0000ff;">public</span> function send<span style="color: #008000;">&#40;</span>array
+        $params<span style="color: #000080;">=</span>array<span style="color: #008000;">&#40;</span><span
+            style="color: #008000;">&#41;</span><span style="color: #008000;">&#41;</span>
+        <div class="description">
+            <h3>Описание</h3>
+            <div>Метод отвечает за отправку почты</div>
+            <h3>Параметры</h3>
+            <div>
+                <p>В метод можно передать <a href="#all_params">параметры</a> в любом сочитании.</p>
+                <p>В случае, если передаются не все параметры или метод вызывают вообще без параметров, необходимые
+                данные берутся из полей класса.</p>
+            </div>
+            <h3>Возвращаемые значения</h3>
+            <div>
+                <p>В случае ошибки возвращает объект класса \Exception, содержащий описание ошибки.</p>
+                <p>В случае успеха возвращает true</p>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
