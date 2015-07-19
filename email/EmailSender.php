@@ -153,7 +153,6 @@
                 $message_part .= "Content-Disposition: attachment; filename=\"$filename\"\r\n";
                 $message_part .= "\r\n";
                 $message_part .= chunk_split(base64_encode($file));
-                $message_part .= "\r\n--{$this->boundary}--\r\n";
 
                 return $message_part;
 
@@ -329,6 +328,7 @@
                             else{
                                 $attach .= $tmpAttach;
                             }
+
                         }
                     }
                     else{
