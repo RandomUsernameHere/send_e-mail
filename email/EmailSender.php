@@ -145,7 +145,7 @@
                     throw new \Exception("Не удается открыть файл");
                 }
 
-                $file = fread($fp, filesize($path));
+                $file = fread($fp, filesize($path['PATH']));
                 fclose($fp);
 
                 $filename = $path['NAME'];
@@ -163,7 +163,7 @@
                 return $e;
             }
         }
-        
+
         protected  function setParams($params){
             foreach($params as $param=>$value){
                 if(!empty($value)){
@@ -198,11 +198,11 @@
 
                         case 'MESSAGE_TEXT':
                             $this->setMessage($value);
-                        break;
+                            break;
 
                         case 'FILE_ATTACH':
                             $this->setMessageAttach($value);
-                        break;
+                            break;
 
                         default:
                             break;
@@ -210,11 +210,11 @@
                 }
             }
         }
-        
+
         protected function checkParams($params){
-            
+
             try{
-                
+
                 if(empty($params['EMAIL_TO'])&&empty($this->emailTo)){
                     throw new \Exception('Не передан или пуст адрес получателя');
                 }
@@ -232,35 +232,36 @@
                 }
 
                 return true;
-                
+
             }catch (\Exception $e){
                 return $e;
-            }           
-            
+            }
+
         }
-        
+
         protected function checkFileAttach($path){
-            
+
             try{
 
                 if(empty($path)){
                     throw new \Exception('Не передан или пуст обязательный параметр $path');
                 }
                 if(is_array($path)){
-                    
+
                     if(
                         (isset($path['PATH'])&&isset($path['NAME']))||
-                        isset($path['PATH'])&&!isset($path['NAME'])                    
+                        isset($path['PATH'])&&!isset($path['NAME'])
                     ){
-                        
+
+
                         if(empty($path['PATH'])){
                             throw new \Exception('Обязательный параметр $path передан в неправильном формате');
                         }
-                        
+
                         if(empty($path['NAME'])){
                             $path['NAME'] = $this->getFileNameFromPath($path['PATH']);
                         }
-                        
+
                         $tmpArray[] = array
                         (
                             'PATH'=>$path['PATH'],
@@ -275,25 +276,35 @@
                         $tmpArray = array();
 
                         foreach($path as $key=>$value){
-                            if(
-                                (isset($value['PATH'])&&isset($value['NAME']))||
-                                isset($value['PATH'])&&!isset($value['NAME'])
-                            ) {
+                            if(is_array($value)){
+                                if(
+                                    (isset($value['PATH'])&&isset($value['NAME']))||
+                                    isset($value['PATH'])&&!isset($value['NAME'])
+                                ) {
 
-                                if (empty($value['PATH'])) {
-                                    throw new \Exception('Обязательный параметр $value передан в неправильном формате');
+                                    if (empty($value['PATH'])) {
+                                        throw new \Exception('Обязательный параметр $value передан в неправильном формате');
+                                    }
+
+                                    if (empty($value['NAME'])) {
+                                        $value['NAME'] = $this->getFileNameFromPath($value['PATH']);
+                                    }
+
+                                    $tmpArray[] = array
+                                    (
+                                        'PATH' => $value['PATH'],
+                                        'NAME' => $value['NAME']
+                                    );
                                 }
-
-                                if (empty($value['NAME'])) {
-                                    $value['NAME'] = $this->getFileNameFromPath($value['PATH']);
-                                }
-
+                            }
+                            else{
                                 $tmpArray[] = array
                                 (
-                                    'PATH' => $value['PATH'],
-                                    'NAME' => $value['NAME']
+                                    'PATH' => $value,
+                                    'NAME' => $this->getFileNameFromPath($value)
                                 );
-                            }    
+                            }
+
                         }
 
                         if(empty($tmpArray)){
@@ -308,7 +319,7 @@
 
                 }
                 else{
-                     $tmpArray[] = array
+                    $tmpArray[] = array
                     (
                         'PATH'=>$path,
                         'NAME'=>$this->getFileNameFromPath($path)
@@ -318,16 +329,16 @@
 
                     return $tmpArray;
                 }
-                
+
             }catch (\Exception $e){
                 return $e;
             }
-            
+
         }
-        
+
         /**
-        * @param string $emailTo
-        */
+         * @param string $emailTo
+         */
         public function setEmailTo($emailTo) {
             $this->emailTo = $emailTo;
         }
@@ -388,7 +399,7 @@
         public function setMessage($message) {
             $this->message = $message;
         }
-        
+
         public function send(array $params=array()){
             $this->setParams($params);
             try{
