@@ -58,6 +58,9 @@
          */
         protected $boundary;
 
+
+        protected $structuredAttachArray;
+
         public  function __construct(array $params=array()){
 
             $this->generateBoundary();
@@ -132,11 +135,11 @@
         protected function generateMessageAttach($path){
             try{
 
-                if(empty($path)){
+                if(empty($path)||empty($path['PATH'])){
                     throw new \Exception('Не передан или пуст обязательный параметр $path');
                 }
 
-                $fp = fopen($path,"r");
+                $fp = fopen($path['PATH'],"r");
                 if (!$fp)
                 {
                     throw new \Exception("Не удается открыть файл");
@@ -145,7 +148,7 @@
                 $file = fread($fp, filesize($path));
                 fclose($fp);
 
-                $filename = $this->getFileNameFromPath($path);
+                $filename = $path['NAME'];
 
                 $message_part = "\r\n--{$this->boundary}\r\n";
                 $message_part .= "Content-Type: application/octet-stream; name=\"$filename\"\r\n";
@@ -195,11 +198,11 @@
 
                         case 'MESSAGE_TEXT':
                             $this->setMessage($value);
-                            break;
+                        break;
 
                         case 'FILE_ATTACH':
                             $this->setMessageAttach($value);
-                            break;
+                        break;
 
                         default:
                             break;
@@ -236,9 +239,91 @@
             
         }
         
-        
+        protected function checkFileAttach($path){
+            
+            try{
+
+                if(empty($path)){
+                    throw new \Exception('Не передан или пуст обязательный параметр $path');
+                }
+                if(is_array($path)){
+                    
+                    if(
+                        (isset($path['PATH'])&&isset($path['NAME']))||
+                        isset($path['PATH'])&&!isset($path['NAME'])                    
+                    ){
+                        
+                        if(empty($path['PATH'])){
+                            throw new \Exception('Обязательный параметр $path передан в неправильном формате');
+                        }
+                        
+                        if(empty($path['NAME'])){
+                            $path['NAME'] = $this->getFileNameFromPath($path['PATH']);
+                        }
+                        
+                        $tmpArray[] = array
+                        (
+                            'PATH'=>$path['PATH'],
+                            'NAME'=>$path['NAME']
+                        );
+
+                        $this->structuredAttachArray = $tmpArray;
+
+                        return $tmpArray;
+                    }
+                    else{
+                        $tmpArray = array();
+
+                        foreach($path as $key=>$value){
+                            if(
+                                (isset($value['PATH'])&&isset($value['NAME']))||
+                                isset($value['PATH'])&&!isset($value['NAME'])
+                            ) {
+
+                                if (empty($value['PATH'])) {
+                                    throw new \Exception('Обязательный параметр $value передан в неправильном формате');
+                                }
+
+                                if (empty($value['NAME'])) {
+                                    $value['NAME'] = $this->getFileNameFromPath($value['PATH']);
+                                }
+
+                                $tmpArray[] = array
+                                (
+                                    'PATH' => $value['PATH'],
+                                    'NAME' => $value['NAME']
+                                );
+                            }    
+                        }
+
+                        if(empty($tmpArray)){
+                            throw new \Exception('Обязательный параметр $value передан в неправильном формате');
+                        }
+
+                        $this->structuredAttachArray = $tmpArray;
+
+                        return $tmpArray;
+                    }
 
 
+                }
+                else{
+                     $tmpArray[] = array
+                    (
+                        'PATH'=>$path,
+                        'NAME'=>$this->getFileNameFromPath($path)
+                    );
+
+                    $this->structuredAttachArray = $tmpArray;
+
+                    return $tmpArray;
+                }
+                
+            }catch (\Exception $e){
+                return $e;
+            }
+            
+        }
         
         /**
         * @param string $emailTo
@@ -249,9 +334,10 @@
 
         /**
          * @param mixed $messageAttach
+         * @return bool|\Exception
          */
         public function setMessageAttach($messageAttach) {
-            $this->messageAttach = $messageAttach;
+            return $this->checkFileAttach($messageAttach);
         }
 
         /**
@@ -314,35 +400,27 @@
 
                 $subject = $this->emailTheme;
 
-                if(!empty($this->messageAttach)){
-                    if(is_array($this->messageAttach)){
-                        $attach = '';
+                if(!empty($this->structuredAttachArray)){
 
-                        foreach($this->messageAttach as $key=>$path){
+                    $attach = '';
 
-                            $tmpAttach = $this->generateMessageAttach($path);
+                    foreach($this->structuredAttachArray as $key=>$path){
 
-                            if(is_a($tmpAttach, '\Exception')){
-                                return $tmpAttach;
-                            }
-                            else{
-                                $attach .= $tmpAttach;
-                            }
+                        $tmpAttach = $this->generateMessageAttach($path);
 
+                        if(is_a($tmpAttach, '\Exception')){
+                            return $tmpAttach;
                         }
-                    }
-                    else{
-                        $attach = $this->generateMessageAttach($this->messageAttach);
-
-                        if(is_a($attach, '\Exception')){
-                            return $attach;
+                        else{
+                            $attach .= $tmpAttach;
                         }
+
                     }
 
-                    $message = $this->message.$attach;
+                    $message = $this->generateMessageText().$attach;
                 }
                 else{
-                    $message = $this->message;
+                    $message = $this->generateMessageText();
                 }
 
                 $headers = $this->generateMessageHeaders();
