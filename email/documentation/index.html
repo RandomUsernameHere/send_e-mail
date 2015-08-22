@@ -205,7 +205,21 @@
                     <td id="FILE_ATTACH">FILE_ATTACH</td>
                     <td>string|array</td>
                     <td></td>
-                    <td>Файл или файлы вложений</td>
+                    <td>Файл или файлы вложений.
+                    Поддерживаются массивы вида:<br>
+                        <span style="color: #990000;">array</span>(<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'/filepath/filename.ext',</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'/filepath/filename2.ext',</span><br>
+                        );<br>
+                        <span style="color: #990000;">array</span>(<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'NAME'=>'Name_in_message',</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'PATH'=>'/filepath/filename.ext'</span><br>
+                        );<br>
+                        <span style="color: #000088;">$attach[]</span> = <span style="color: #990000;">array</span>(<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'NAME'=>'Name_in_message',</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #0000ff;">'PATH'=>'/filepath/filename.ext'</span><br>
+                        );<br>
+                    </td>
                 </tr>
 
             </tbody>
